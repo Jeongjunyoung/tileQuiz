@@ -12,6 +12,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -42,11 +43,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import junit.framework.Test;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import tq.apps.obg.R;
 import tq.apps.obg.databinding.ActivityTqBinding;
@@ -64,7 +64,7 @@ import tq.apps.obg.service.UserServiceInterface;
 
 public class TQActivity extends AppCompatActivity implements View.OnClickListener, Animation.AnimationListener{
     private ActivityTqBinding mBinding;
-    private static final int RC_LEADERBOARD_UI = 9004;
+    private static final int RC_LEADERBOARD_UI = 0;
     private int levelNum, hintNum;
     private DBHelper dbHelper;
     private int quizLife = 3;
@@ -72,7 +72,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
     private InterstitialAd mInterstitialAd;
     private boolean isPlayerQuiz;
     private Handler mProgressHandler;
-    private float quizCount;
+    private int quizCount;
     private RoundCornerProgressBar quizProg;
     private Fragment fragment = null;
     private long mQuizScore;
@@ -113,7 +113,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
     @SuppressLint("HandlerLeak")
     private void initView() {
         AdRequest adRequest = new AdRequest.Builder()
-                //.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mBinding.tqAdView.loadAd(adRequest);
         setFrontAds();
@@ -135,7 +135,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
             kindStr = "emblem_score";
         }
         mServiceInterface.setIsPlayerQuiz(isPlayerQuiz);
-        quizCount = 150;
+        quizCount = 175;
         quizProg = mBinding.quizTimer;
         hintNum = mServiceInterface.getHintNum();
         quizProg.setProgressColor(Color.parseColor("#b7e4b6"));
@@ -151,6 +151,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
         falseAnim = AnimationUtils.loadAnimation(this, R.anim.shake_btn_false);
         btnLayoutAnim = AnimationUtils.loadAnimation(this, R.anim.btn_layout_anim);
         btnLayoutAnim.setAnimationListener(this);
+        mProgressHandler = new Handler();
         //mBinding.pauseBtn.setOnClickListener(this);
         //mBinding.pauseCloseBtn.setOnClickListener(this);
         //quizReadyListener();
@@ -300,7 +301,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
 
     private void startTimerThread() {
         mProgressHandler.removeMessages(0);
-        quizCount = 150;
+        quizCount = 175;
         quizProg.setMax(quizCount);
         quizProg.setProgress(quizCount);
         mProgressHandler.sendEmptyMessage(0);
@@ -309,7 +310,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
     @SuppressLint("RestrictedApi")
     private void quizGameOverListener() {
         isGameOver = true;
-        mProgressHandler.removeMessages(0);
+        //mProgressHandler.removeMessages(0);
         levelNum = 9;
         if (isPlayerQuiz) {
             Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this)).
@@ -326,7 +327,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
     //Quiz Ready 리스너
     private void quizReadyListener() {
         levelNum = 0;
-        quizCount = 150;
+        quizCount = 175;
         quizLife = 3;
         quizProg.setProgress(quizCount);
         mBinding.quizLife1.setBackgroundResource(R.drawable.icon_life);
@@ -399,18 +400,21 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
 
     /*@Override
     protected void onPause() {
-        //mProgressHandler.removeMessages(0);
+        System.out.println("ppppppppp");
+        *//*mProgressHandler.removeMessages(0);*//*
         super.onPause();
     }
 
     @Override
     protected void onPostResume() {
+        System.out.println("rrrrrrrrrr");
         if (!isGameOver) {
+            System.out.println("if rrrrrrrrrrrrr");
             //mProgressHandler.sendEmptyMessage(0);
         }
         super.onPostResume();
-    }
-*/
+    }*/
+
     private void btnSetEnable(boolean isTrue) {
         mBinding.contents1.setEnabled(isTrue);
         mBinding.contents2.setEnabled(isTrue);
@@ -462,7 +466,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.front_ads_unit_id));
         final AdRequest adRequest = new AdRequest.Builder()
-                //.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mInterstitialAd.loadAd(adRequest);
         mInterstitialAd.setAdListener(new AdListener(){
@@ -516,4 +520,43 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
             }
         };
     }
+
+    /*public class AsyncTaskTimer extends TimerTask{
+        @Override
+        public void run() {
+        }
+        int secTime;
+        protected void onPreExecute() {
+            mBinding.quizTimer.setMax(quizCount);
+            super.onPreExecute();
+        }
+        @Override
+        protected Long doInBackground(String... params) {
+            //int durationTime = Integer.parseInt(params[0]);
+
+            secTime = 200;
+            while (secTime >= 0) {
+                publishProgress(secTime);
+                if(secTime == 0){
+                    System.out.println("End.. End.. End..");
+                    break;
+                }
+                secTime--;
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+            quizProg.setProgress(progress[0]);
+        }
+
+        protected void onPostExecute(Long result) {
+            super.onPostExecute(result);
+        }
+    }*/
 }
