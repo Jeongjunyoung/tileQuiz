@@ -81,7 +81,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
         mContext = this;
         AdView mAdView = mBinding.frontAdview;
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                //.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mAdView.loadAd(adRequest);
         mBinding.playerQuiz.setOnClickListener(this);
@@ -170,7 +170,7 @@ public class FrontActivity extends AppCompatActivity implements View.OnClickList
     private void loadRewardedVideoAd() {
         mRewarded.loadAd(getResources().getString(R.string.reward_ads_unit_id),
                 new AdRequest.Builder()
-                        .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                        //.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                         .build());
     }
 

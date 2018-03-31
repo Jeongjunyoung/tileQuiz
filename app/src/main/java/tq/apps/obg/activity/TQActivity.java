@@ -113,7 +113,7 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
     @SuppressLint("HandlerLeak")
     private void initView() {
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                //.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mBinding.tqAdView.loadAd(adRequest);
         setFrontAds();
@@ -466,14 +466,14 @@ public class TQActivity extends AppCompatActivity implements View.OnClickListene
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.front_ads_unit_id));
         final AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                //.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mInterstitialAd.loadAd(adRequest);
         mInterstitialAd.setAdListener(new AdListener(){
             @Override
             public void onAdClosed() {
                 AdRequest adRequestClosed = new AdRequest.Builder()
-                        .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                        //.addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                         .build();
                 mInterstitialAd.loadAd(adRequestClosed);
             }
